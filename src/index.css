@@ -1,0 +1,120 @@
+/* 🔥 ROOT VARIABLES */
+:root {
+  --bg: #f8fafc;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+
+  --primary: #f97316; /* 🟧 ORANGE BRAND */
+  --primary-hover: #ea580c;
+
+  --card: #ffffff;
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* 🔥 RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 🔥 FULL SIZE */
+html, body, #root {
+  width: 100%;
+  height: 100%;
+}
+
+/* 🔥 BODY (FIXED) */
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* 🔥 ROOT */
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* 🧠 HEADINGS */
+h1, h2 {
+  color: var(--text);
+}
+
+h1 {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+h2 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+/* 🔗 LINKS */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* 🔘 BUTTON (GLOBAL BUT SAFE) */
+button {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: var(--primary-hover);
+}
+
+/* 📥 INPUTS (NEUTRAL, NOT DARK) */
+input, select {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  outline: none;
+}
+
+input:focus, select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(249,115,22,0.2);
+}
+
+/* 📦 CARD */
+.card {
+  background: var(--card);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+/* 📋 TABLE (LIGHT BASE ONLY) */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  padding: 12px;
+  font-size: 13px;
+  color: var(--muted);
+  background: #f1f5f9;
+}
+
+td {
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  color: var(--text);
+}

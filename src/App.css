@@ -1,0 +1,84 @@
+/* 🔥 RESET (fix spacing issues) */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 🔥 BODY */
+body {
+  font-family: Arial, sans-serif;
+  background: #0b1220;
+  color: #fff;
+}
+
+/* 🔥 ROOT (VERY IMPORTANT - removes left gap) */
+#root {
+  width: 100%;
+  height: 100vh;
+}
+
+/* 🔗 LINKS */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* 🧱 LAYOUT HELPERS */
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 📦 CARD STYLE (for dashboard later) */
+.card {
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+/* 🔘 BUTTON */
+button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  background: #4f46e5;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #4338ca;
+}
+
+/* 📥 INPUT */
+input, select {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #333;
+  background: #0f172a;
+  color: white;
+}
+
+/* 📋 TABLE (future use) */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #333;
+  text-align: left;
+}
+
+th {
+  color: #aaa;
+}
