@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { auth, db } from "./firebase";
 import {
   signInWithEmailAndPassword,
@@ -6,6 +6,7 @@ import {
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function Login() {
   const [isRegister, setIsRegister] = useState(false);
@@ -13,8 +14,36 @@ function Login() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("hr");
   const [loading, setLoading] = useState(false);
+  
+  // Mobile responsive state
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   const navigate = useNavigate();
+
+  // Listen to window resize to toggle mobile view
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const getFriendlyErrorMessage = (error) => {
+    switch (error.code) {
+      case "auth/missing-password":
+        return "Please enter your password.";
+      case "auth/invalid-email":
+        return "The email address is not valid.";
+      case "auth/user-not-found":
+        return "No account found with this email.";
+      case "auth/wrong-password":
+        return "Incorrect password. Please try again.";
+      case "auth/email-already-in-use": // Corrected from email-already-in-box
+        return "This email is already registered.";
+      default:
+        // Fallback: strip "Firebase:" and parentheses if code isn't caught
+        return error.message.replace(/Firebase:|\(auth\/.*\)./g, "").trim();
+    }
+  };
 
   const handleLogin = async () => {
     setLoading(true);
@@ -24,14 +53,15 @@ function Login() {
       const userSnap = await getDoc(doc(db, "users", uid));
 
       if (!userSnap.exists()) {
-        alert("No user data found.");
+        toast.error("Account data not found. Please contact support.");
         return;
       }
 
       localStorage.setItem("role", userSnap.data().role);
+      toast.success(`Welcome back!`);
       navigate("/dashboard");
     } catch (error) {
-      alert(error.message);
+      toast.error(getFriendlyErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -52,16 +82,29 @@ function Login() {
       localStorage.setItem("role", role);
       navigate("/dashboard");
     } catch (error) {
-      alert(error.message);
+      toast.error(getFriendlyErrorMessage(error));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={styles.container}>
+    <div
+      style={{
+        ...styles.container,
+        flexDirection: isMobile ? "column" : "row",
+        overflowY: isMobile ? "auto" : "hidden",
+      }}
+    >
       {/* LEFT SIDE - BRANDING & YOUTUBE BACKGROUND */}
-      <div style={styles.left}>
+      <div
+        style={{
+          ...styles.left,
+          flex: isMobile ? "none" : 1.2,
+          minHeight: isMobile ? "280px" : "100%",
+          width: isMobile ? "100%" : "auto",
+        }}
+      >
         <div style={styles.videoWrapper}>
           <iframe
             style={styles.iframe}
@@ -71,27 +114,62 @@ function Login() {
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           ></iframe>
         </div>
-        
-        <div style={styles.videoOverlay}>
+
+        <div
+          style={{
+            ...styles.videoOverlay,
+            padding: isMobile ? "30px 20px" : "60px",
+            justifyContent: isMobile ? "center" : "flex-start",
+            textAlign: isMobile ? "center" : "left",
+          }}
+        >
           <div style={styles.content}>
             <div style={styles.logoBadge}>IMOSTI</div>
-            <h1 style={styles.brandTitle}>IMOSTI HR</h1>
-            <p style={styles.brandDesc}>
-              Streamline your workforce management with our next-generation digital ecosystem.
+            <h1
+              style={{
+                ...styles.brandTitle,
+                fontSize: isMobile ? "40px" : "64px",
+              }}
+            >
+              IMOSTI HR
+            </h1>
+            <p
+              style={{
+                ...styles.brandDesc,
+                fontSize: isMobile ? "16px" : "19px",
+              }}
+            >
+              Streamline your workforce management with our next-generation
+              digital ecosystem.
             </p>
           </div>
         </div>
       </div>
 
       {/* RIGHT SIDE - MODERNIZED FORM */}
-      <div style={styles.right}>
-        <div style={styles.card}>
+      <div
+        style={{
+          ...styles.right,
+          flex: isMobile ? "1" : 0.8,
+          padding: isMobile ? "20px" : "40px",
+          width: isMobile ? "100%" : "auto",
+          boxSizing: "border-box",
+        }}
+      >
+        <div
+          style={{
+            ...styles.card,
+            padding: isMobile ? "32px 24px" : "48px",
+          }}
+        >
           <div style={styles.headerArea}>
-            <h2 style={styles.title}>
+            <h2 style={{ ...styles.title, fontSize: isMobile ? "28px" : "32px" }}>
               {isRegister ? "Create Account" : "Welcome Back"}
             </h2>
             <p style={styles.subtitle}>
-              {isRegister ? "Sign up to start managing your team" : "Enter your details to access your dashboard"}
+              {isRegister
+                ? "Sign up to start managing your team"
+                : "Enter your details to access your dashboard"}
             </p>
           </div>
 
@@ -134,24 +212,17 @@ function Login() {
 
             <button
               onClick={isRegister ? handleRegister : handleLogin}
-              style={loading ? {...styles.button, opacity: 0.7} : styles.button}
+              style={loading ? { ...styles.button, opacity: 0.7 } : styles.button}
               disabled={loading}
             >
-              {loading ? "Authenticating..." : (isRegister ? "Create Account" : "Sign In to Dashboard")}
+              {loading
+                ? "Authenticating..."
+                : isRegister
+                ? "Create Account"
+                : "Sign In to Dashboard"}
             </button>
           </div>
 
-          <div style={styles.footer}>
-            <p style={styles.switchText}>
-              {isRegister ? "Already have an account?" : "New to the platform?"}
-              <span
-                onClick={() => setIsRegister(!isRegister)}
-                style={styles.link}
-              >
-                {isRegister ? " Log in here" : " Create an account"}
-              </span>
-            </p>
-          </div>
         </div>
       </div>
     </div>
@@ -165,11 +236,9 @@ const styles = {
     width: "100vw",
     fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
     backgroundColor: "#F1F5F9",
-    overflow: "hidden",
   },
   /* --- LEFT SIDE STYLES --- */
   left: {
-    flex: 1.2,
     position: "relative",
     overflow: "hidden",
     background: "#111",
@@ -196,7 +265,6 @@ const styles = {
     zIndex: 1,
     display: "flex",
     alignItems: "center",
-    padding: "60px",
   },
   logoBadge: {
     backgroundColor: "rgba(255, 255, 255, 0.15)",
@@ -218,30 +286,25 @@ const styles = {
     color: "#fff",
   },
   brandTitle: {
-    fontSize: "64px",
     fontWeight: "900",
     marginBottom: "16px",
     lineHeight: "1",
     textShadow: "0 4px 12px rgba(0,0,0,0.3)",
   },
   brandDesc: {
-    fontSize: "19px",
     lineHeight: "1.6",
     opacity: 0.9,
     fontWeight: "400",
   },
-  /* --- RIGHT SIDE STYLES (MODERNIZED) --- */
+  /* --- RIGHT SIDE STYLES --- */
   right: {
-    flex: 0.8,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    padding: "40px",
   },
   card: {
     width: "100%",
     maxWidth: "460px",
-    padding: "48px",
     borderRadius: "28px",
     background: "#ffffff",
     boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.1)",
@@ -251,7 +314,6 @@ const styles = {
     marginBottom: "36px",
   },
   title: {
-    fontSize: "32px",
     fontWeight: "800",
     color: "#1E293B",
     marginBottom: "10px",
@@ -309,7 +371,6 @@ const styles = {
     textAlign: "center",
   },
   switchText: {
-    fontSize: "15px",
     color: "#64748B",
   },
   link: {
